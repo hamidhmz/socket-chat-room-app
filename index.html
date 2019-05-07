@@ -1,0 +1,104 @@
+<html>
+    <head>
+        <title>Chat with socket.io and node.js</title>
+        <style>
+            #chat{
+                height: 500px;
+            }
+            #contentWrap{
+                display: none;
+            }
+            #chatWrap{
+                float: left;
+                border: 1px #000 solid;
+            }
+            .error{
+                color:red;
+            }
+            .whisper{
+                color:gray;
+                font-style:italic;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="nickWrap">
+            <p>Enter a username:</p>
+            <p id="nickError"></p>
+            <form id="setNick">
+                <input type="text" size="35" id="nickname">
+                <input type="submit">
+            </form>
+        </div>
+        <div id="contentWrap">
+            <div id="chatWrap">
+                <div id="chat"></div>
+                <form id="send-message">
+                    <input type="text" size="35" id="message">
+                    <input type="submit" >
+                </form>
+            </div>
+            <div id="users"></div>
+        </div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+        <script>
+            $(document).ready(function () {
+                const socket = io.connect();
+                const users = $("#users");
+                const nickForm = $("#setNick");
+                const nickError = $("#nickError");
+                const nickBox = $("#nickname");
+                const messageForm = $("#send-message");
+                const messageBox = $("#message");
+                const chat = $("#chat");
+                nickForm.submit(function(e){
+                    e.preventDefault();
+                    socket.emit("new user",nickBox.val(),function(data){
+                        console.log(data);
+                        if(data){
+                            $("#nickWrap").hide();
+                            $("#contentWrap").show();
+                        }else{
+                            nickError.html("that username is already taken!try again");
+                        }
+                    });
+                    nickBox.val("");
+                });
+
+                socket.on("usernames",function(data){
+                    let html = "";
+                    for(i=0;i<data.length;i++){
+                        html += data[i]  + "<br/>";
+                    }
+                    users.html(html);
+                });
+
+                messageForm.submit(function(e){
+                    e.preventDefault();
+                    socket.emit("send message",messageBox.val(),function(data){
+                        chat.append ("<span class='error'>"+data+ "</span><br/>");
+                    });
+                    messageBox.val("");
+                });
+
+                socket.on("load old msgs",function(docs){
+                    for(i=0;i<docs.length;i++){
+                        displayMsg(docs[i]);
+                    }
+                });
+
+                socket.on("new message",function(data){
+                    console.log(data);
+                    displayMsg(data);
+                });
+                function displayMsg(data){
+                    chat.append ("<span class='msg'><b>"+data.nick+": </b>"+data.msg+ "</span><br/>");
+                }
+                socket.on("whisper",function(data){
+                    chat.append("<span class='whisper'><b>"+data.nick+":</b>"+data.msg+"</span><br/>");
+                });
+            });
+        </script>
+    </body>
+</html>

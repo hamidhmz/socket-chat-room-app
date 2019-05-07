@@ -1,0 +1,24 @@
+{
+  "name": "socket-chat-room-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hamidhmz/socket-chat-room-app.git"
+  },
+  "author": "hamidreza nasrollahy",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hamidhmz/socket-chat-room-app/issues"
+  },
+  "homepage": "https://github.com/hamidhmz/socket-chat-room-app#readme",
+  "dependencies": {
+    "express": "^4.16.4",
+    "mongoose": "^5.5.6",
+    "socket.io": "^2.2.0"
+  }
+}
